@@ -31,12 +31,22 @@ const FerryAppStore = ({ children }) => {
   const [callFerry, setCallFerry] = useState(false);
   //   const [callFerry, setCallFerry] = useState(false);
   //   const [fetchingMessage, setFetchingMessage] = useState("");
-  //   const [timeStamp, setTimeStamp] = useState(null);
+  const [timeStamp, setTimeStamp] = useState(new Date());
+  const [views, setViews] = useState(null);
   const [cities, setCities] = useState([]);
   const [currentView, setCurrentView] = useState([35.264277, -76.833359, 8]);
   //   const [routes, setRoutes] = useState([]);
   const [state, setState] = useState(initState);
 
+  const setInitData = () => {
+    let newTime = new Date();
+
+    setState({
+      ...state,
+      timeStamp: newTime.toLocaleTimeString(),
+      views: views,
+    });
+  };
   const getNCFerries = async () => {
     let newTime = new Date();
     axiosRetry(axios, {
@@ -80,14 +90,15 @@ const FerryAppStore = ({ children }) => {
   };
 
   useEffect(() => {
-    getNCFerries();
+    setInitData();
 
-    const interval = setInterval(() => {
-      getNCFerries();
-    }, 60000);
+    // const interval = setInterval(() => {
+    //   getNCFerries();
+    // }, 60000);
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, []);
+
   const getWeather = async () => {
     const CITY1 = axios.get(
       "https://api.weather.gov/gridpoints/AKQ/95,27/forecast"
@@ -142,25 +153,26 @@ const FerryAppStore = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    getWeather();
-    const interval = setInterval(() => {
-      getWeather();
-    }, 23200000);
+  // useEffect(() => {
+  //   getWeather();
+  //   const interval = setInterval(() => {
+  //     getWeather();
+  //   }, 23200000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
   return (
     <FerryAppContext.Provider
-      value={[
-        state,
-        setState,
+      value={{
+        views,
+        setViews,
         currentView,
         setCurrentView,
         ferries,
         setFerries,
         callFerry,
-      ]}
+        timeStamp,
+      }}
     >
       {children}
     </FerryAppContext.Provider>

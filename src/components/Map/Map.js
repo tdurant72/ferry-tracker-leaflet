@@ -1,4 +1,6 @@
 // import { useGlobalContext } from "../../contexts/GlobalContext";
+import { useQuery } from "react-query";
+import { getFerries } from "../../calls";
 import { FerryAppContext } from "../../contexts/GlobalContext";
 import { key } from "../../key";
 import ports from "../../data/ports";
@@ -32,11 +34,12 @@ const LegendBody = styled.div`
 `;
 
 const Map = () => {
+  const { data, error, isLoading, isError } = useQuery("ferries", getFerries);
   // const { ferries, timeStamp } = useGlobalContext();
   // const { currentView } = useContext(AppContext);
-  const [state, setState, currentView, setCurrentView, ferries] =
+  const { timeStamp, currentView, setCurrentView } =
     useContext(FerryAppContext);
-  console.log("currentView", currentView);
+  console.log("currentView", currentView, "data", data);
 
   console.log("initial currentView value", currentView);
 
@@ -170,8 +173,11 @@ const Map = () => {
   };
 
   useEffect(() => {
-    console.log("useeffect called for createMap", ferries);
-    createMap();
+    console.log("useeffect called for createMap", data);
+    if (data) {
+      createMap();
+    }
+
     // createFerryMarkers();
     return () => {
       // console.log("ferryMap", ferryMap, "ferryOverlay", ferryOverlay);
@@ -179,11 +185,11 @@ const Map = () => {
         ferryMap.remove();
       }
     };
-  }, []);
+  }, [data]);
 
   const createFerryMarkers = () => {
     ferryOverlay.clearLayers();
-    ferries.forEach((ferry) => {
+    data.features.map((ferry) => {
       let COG = ferry.properties.COG;
       let SOG = ferry.properties.SOG;
       let bearing = parseInt(COG, 10);
@@ -235,15 +241,20 @@ const Map = () => {
     }
   };
   useEffect(() => {
-    createFerryMarkers();
-    centerMapView();
+    if (data) {
+      createFerryMarkers();
+      // centerMapView();
+    }
+
     // return () => {
     //   cleanup
     // }
-  }, [state.timeStamp, currentView]);
+  }, [data, timeStamp, currentView]);
   // useEffect(() => {
   //   centerMapView();
   // }, [updatedView]);
+  if (isLoading) return <h2>Loading...</h2>;
+  if (isError) return <h2>Something went wrong...</h2>;
 
   return <Wrapper width="100VW" height="100vh" id="bingmap" ref={mapRef} />;
 };

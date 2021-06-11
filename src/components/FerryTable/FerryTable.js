@@ -1,4 +1,6 @@
 import React, { Component, useContext } from "react";
+import { useQuery } from "react-query";
+import { getFerries } from "../../calls";
 import PropTypes from "prop-types";
 import { FerryAppContext } from "../../contexts/GlobalContext";
 import {
@@ -53,11 +55,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FerryTable = () => {
-  const [state, setState, currentView, setCurrentView, ferries] =
+  const { data, error, isLoading, isError } = useQuery("ferries", getFerries);
+  const { views, setViews, currentView, setCurrentView } =
     useContext(FerryAppContext);
   const classes = useStyles();
-  let { latitude, longitude } = ferries;
-  let { tlatitude, tlongitude } = state.views;
+  // let { latitude, longitude } = data;
+  // let { tlatitude, tlongitude } = views;
+  if (isLoading) return <h2>Loading...</h2>;
+  if (isError) return <h2>Something went wrong...</h2>;
   return (
     <div>
       <TableContainer component={Paper} className={classes.root}>
@@ -83,7 +88,7 @@ const FerryTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {ferries.map((boat) => (
+            {data.features.map((boat) => (
               <TableRow
                 key={boat.id}
                 boat={boat}

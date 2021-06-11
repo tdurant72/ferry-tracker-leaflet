@@ -5,13 +5,14 @@ const divStyle = { display: "flex" };
 const imgStyle = { padding: "10px 0px" };
 const Loader = () => {
   //console.log(props)
-  const [state, ferries, callFerry] = useContext(FerryAppContext);
+  const { state, ferries, callFerry, fetchingMessage } =
+    useContext(FerryAppContext);
   console.log("state", state, "ferries", ferries, ferries.length);
   return (
     <div style={divStyle}>
       {callFerry === true ? (
         <>
-          <h2 style={h2Style}>{state.fetchingMessage}</h2>
+          <h2 style={h2Style}>{fetchingMessage}</h2>
 
           <img
             style={imgStyle}
