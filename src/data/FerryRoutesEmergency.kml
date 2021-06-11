@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Ferry Routes Emergency</name>
+    <Style id="line-7CB342-5263-nodesc-normal">
+      <LineStyle>
+        <color>ff42b37c</color>
+        <width>5.263</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-7CB342-5263-nodesc-highlight">
+      <LineStyle>
+        <color>ff42b37c</color>
+        <width>7.8945</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-7CB342-5263-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-7CB342-5263-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-7CB342-5263-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-7CB342-6038-nodesc-normal">
+      <LineStyle>
+        <color>ff42b37c</color>
+        <width>6.038</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-7CB342-6038-nodesc-highlight">
+      <LineStyle>
+        <color>ff42b37c</color>
+        <width>9.057</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-7CB342-6038-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-7CB342-6038-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-7CB342-6038-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Placemark>
+      <name>Rodanthe to Stumpy Point</name>
+      <styleUrl>#line-7CB342-5263-nodesc</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>
+          -75.7424325,35.6995997,0
+          -75.7499856,35.6867735,0
+          -75.7486123,35.6711562,0
+          -75.6662149,35.6516303,0
+          -75.4732675,35.6019572,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Hatteras to Stumpy Point</name>
+      <styleUrl>#line-7CB342-6038-nodesc</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>
+          -75.7085809,35.2107666,0
+          -75.7176171,35.2772731,0
+          -75.7066308,35.506774,0
+          -75.7052575,35.6028579,0
+          -75.7066308,35.6419288,0
+          -75.7327233,35.6586676,0
+          -75.7519494,35.6631307,0
+          -75.7424325,35.6995997,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>
