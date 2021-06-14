@@ -6,17 +6,19 @@ export const getFerries = async () => {
   if (!response.ok) {
     throw new Error("Something went wrong");
   }
+  console.log("call made to ferries");
   return response.json();
 };
-export const getCityOne = async () => {
-  const response = await fetch(
-    `https://api.weather.gov/gridpoints/AKQ/95,27/forecast`
-  );
-  if (!response.ok) {
-    throw new Error("Something went wrong");
-  }
-  return response.json();
-};
+// export const getCityOne = async () => {
+//   const resCO = await fetch(
+//     `https://api.weather.gov/gridpoints/AKQ/95,27/forecast`
+//   );
+//   if (!resCO.ok) {
+//     throw new Error("Something went wrong");
+//   }
+//   console.log("city one called", resCO.json());
+//   return resCO.json();
+// };
 // export const getCityTwo = async () => {
 //   const response = await fetch(
 //     `https://api.weather.gov/gridpoints/MHX/44,41/forecast`

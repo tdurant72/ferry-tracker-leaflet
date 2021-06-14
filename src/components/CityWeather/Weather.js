@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 // import { useGlobalContext } from "../../contexts/GlobalContext";
 // import { FerryAppContext } from "../../contexts/GlobalContext";
 import { useQuery } from "react-query";
-import { getWeather, getCityOne } from "../../calls";
+import { getWeather } from "../../calls";
 import axios from "axios";
 import axiosRetry from "axios-retry";
 import CityWeather from "./CityWeather";
@@ -12,20 +12,34 @@ import {
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core";
 
+const getCityOne = async () => {
+  const resCO = await fetch(
+    `https://api.weather.gov/gridpoints/AKQ/95,27/forecast`
+  );
+  if (!resCO.ok) {
+    throw new Error("Something went wrong");
+  }
+  console.log("city one called", resCO.json());
+  return resCO.json();
+};
 const Weather = () => {
   // const [state] = useContext(FerryAppContext);
   // const [cityOne, setCityOne] = useState(null);
-  const { data, error, isLoading, isError } = useQuery(
-    "weatherAll",
-    getWeather
-  );
-  const { data: cityOne } = useQuery("city1", getCityOne);
-  console.log("weather", data, "cityOne", cityOne);
-  if (isLoading) return <h2>Loading...</h2>;
-  if (isError) return <h2>Something went wrong...</h2>;
+  // const { data:dataCO, error, isLoading:isLoadingCO, isError:isErrorCO } = useQuery(
+  //   "weatherAll",
+  //   getWeather
+  // );
+  const {
+    data: cityOne,
+    isLoading: isLoadingCO,
+    isError: isErrorCO,
+  } = useQuery("city1", getCityOne);
+  console.log("weather", cityOne);
+  if (isLoadingCO) return <h2>Loading...</h2>;
+  if (isErrorCO) return <h2>Something went wrong...</h2>;
   return (
     <>
-      {data}
+      {cityOne}
       {/* <CityWeather
         key={cityOne.cityName}
         detailedForecast={cityOne.detailedForecast}
