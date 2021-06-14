@@ -1,6 +1,6 @@
 // import { useGlobalContext } from "../../contexts/GlobalContext";
 import { useQuery } from "react-query";
-import { getFerries } from "../../calls";
+// import { getFerries } from "../../calls";
 import { FerryAppContext } from "../../contexts/GlobalContext";
 import { key } from "../../key";
 import ports from "../../data/ports";
@@ -32,14 +32,33 @@ const LegendBody = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 20px;
 `;
-
+const getFerries = async () => {
+  const response = await fetch(
+    `https://qc.eapps.ncdot.gov/services/ferrytrackerservice-dev/TrackerData`
+  );
+  if (!response.ok) {
+    throw new Error("Something went wrong");
+  }
+  console.log("call made to ferries");
+  return response.json();
+};
 const Map = () => {
-  const { data, error, isLoading, isError } = useQuery("ferries", getFerries);
+  const {
+    data: ferryData,
+    status,
+    error,
+    isLoading,
+    isError,
+  } = useQuery("ferries", getFerries, {
+    staleTime: 2000,
+    cacheTime: 6000,
+    refetchInterval: 60000,
+  });
   // const { ferries, timeStamp } = useGlobalContext();
   // const { currentView } = useContext(AppContext);
   const { timeStamp, currentView, setCurrentView } =
     useContext(FerryAppContext);
-  console.log("currentView", currentView, "data", data);
+  console.log("currentView", currentView);
 
   console.log("initial currentView value", currentView);
 
@@ -173,8 +192,8 @@ const Map = () => {
   };
 
   useEffect(() => {
-    console.log("useeffect called for createMap", data);
-    if (data) {
+    console.log("useeffect called for createMap", ferryData);
+    if (ferryData) {
       createMap();
     }
 
@@ -185,11 +204,11 @@ const Map = () => {
         ferryMap.remove();
       }
     };
-  }, [data]);
+  }, [ferryData]);
 
   const createFerryMarkers = () => {
     ferryOverlay.clearLayers();
-    data.features.map((ferry) => {
+    ferryData.features.map((ferry) => {
       let COG = ferry.properties.COG;
       let SOG = ferry.properties.SOG;
       let bearing = parseInt(COG, 10);
@@ -241,7 +260,7 @@ const Map = () => {
     }
   };
   useEffect(() => {
-    if (data) {
+    if (ferryData) {
       createFerryMarkers();
       // centerMapView();
     }
@@ -249,13 +268,20 @@ const Map = () => {
     // return () => {
     //   cleanup
     // }
-  }, [data, timeStamp, currentView]);
+  }, [ferryData, timeStamp, currentView]);
   // useEffect(() => {
   //   centerMapView();
   // }, [updatedView]);
-  if (isLoading) return <h2>Loading...</h2>;
-  if (isError) return <h2>Something went wrong...</h2>;
-
-  return <Wrapper width="100VW" height="100vh" id="bingmap" ref={mapRef} />;
+  // if (isLoading) return ;
+  // if (isError) return ;
+  return (
+    <>
+      {status === "loading" && <h2>Loading...</h2>},
+      {status == "error" && <h2>Something went wrong...</h2>},
+      {status === "success" && (
+        <Wrapper width="100VW" height="100vh" id="bingmap" ref={mapRef} />
+      )}
+    </>
+  );
 };
 export default Map;
