@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const TerminalTable = () => {
-  const [state, setState, currentView, setCurrentView] =
+  const [state, setState, currentView, setCurrentView, , , ,] =
     useContext(FerryAppContext);
   // const [state, setState, currentView, setCurrentView] = useContext(FerryAppContext);
 

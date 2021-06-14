@@ -19,7 +19,7 @@ require("leaflet-bing-layer");
 
 const Wrapper = styled.div`
   width: ${(props) => props.width};
-  height: ${(props) => `calc(${props.height} - 100px)`};
+  height: ${(props) => `calc(${props.height} - 150px)`};
 `;
 const Legend = styled.div`
   width: 800px;
@@ -102,14 +102,16 @@ const Map = () => {
         icon: terminal,
       })
         .bindPopup(
-          `<div style='text-align:center;'><strong>${port.properties.title}
-             </strong> <br/><a href="tel:${portNum}"> phone: ${formatPhoneNumber(
+          `<div style='text-align:center;font-size:14px;'><strong>${
+            port.properties.title
+          }
+             </strong> <br/><a href="tel:${portNum}"> Phone: ${formatPhoneNumber(
             portNum
           )}</a>
-             <br/> address: ${port.properties.address}
+             <br/> ${port.properties.address}
              ${
                port.properties.Site !== null
-                 ? `<br/><a href="${port.properties.Site}" target="_blank">Destination Site</a> `
+                 ? `<br/><a href="${port.properties.Site}" target="_blank">Visitor Information</a> `
                  : ``
              }
              ${
@@ -126,7 +128,7 @@ const Map = () => {
         //     port.properties.phone +
         //     "<br/> address: " +
         //     port.properties.address +
-        //     "<br/> Destination Site:"+
+        //     "<br/> Visitor Information:"+
         //     port.properties.Site+
         //     "</div>"
         // )
@@ -196,7 +198,7 @@ const Map = () => {
           icon: ferryDockedIcon,
         })
           .bindPopup(
-            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${ferry.properties.VesselName}</strong></h3> <br/><p style="text-align:left;margin-bottom:0;">${ferry.properties.summary}</p>`
+            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${ferry.properties.VesselName}</strong></h3> <br/><p style="text-align:left;margin-bottom:0;font-size:14px;">${ferry.properties.summary}</p>`
           )
           .addTo(ferryOverlay);
       } else {
@@ -206,7 +208,7 @@ const Map = () => {
           rotationOrigin: "center",
         })
           .bindPopup(
-            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${ferry.properties.VesselName}</strong></h3> <br/><p style="text-align:left;margin-top:0;">${ferry.properties.summary}</p>`
+            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${ferry.properties.VesselName}</strong></h3> <br/><p style="text-align:left;margin-top:0; font-size:14px;">${ferry.properties.summary}</p>`
           )
 
           .addTo(ferryOverlay);

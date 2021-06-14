@@ -11,10 +11,10 @@ import {
 } from "@material-ui/core";
 
 const Weather = () => {
-  const [state] = useContext(FerryAppContext);
+  const [, , , , , , , cities] = useContext(FerryAppContext);
   return (
     <>
-      {state.cities.map((city, index) => {
+      {cities.map((city, index) => {
         return (
           <CityWeather
             key={index}

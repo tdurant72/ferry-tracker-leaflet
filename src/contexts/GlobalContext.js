@@ -18,12 +18,12 @@ const initState = {
   routes: [],
   isLoading: true,
   timeStamp: null,
-  cities: [],
+  // cities: [],
   weather: [],
   views: views,
   // currentView: [35.264277, -76.833359, 8],
   fetchingMessage: "Data Loading",
-  failMessage: "Data failed to load, try again later.",
+  failMessage: null,
 };
 const FerryAppStore = ({ children }) => {
   //   const [loading, setLoading] = useState(true);
@@ -39,6 +39,12 @@ const FerryAppStore = ({ children }) => {
 
   const getNCFerries = async () => {
     let newTime = new Date();
+    setCallFerry(true);
+    setState({
+      ...state,
+      fetchingMessage: "Data Loading",
+      failMessage: null,
+    });
     axiosRetry(axios, {
       retries: 3,
       shouldResetTimeout: true,
@@ -66,7 +72,7 @@ const FerryAppStore = ({ children }) => {
           views: views,
         });
         setFerries(response.data.features);
-        setCallFerry(true);
+        setCallFerry(false);
         // console.log(state);
       });
     } catch (error) {
@@ -74,7 +80,7 @@ const FerryAppStore = ({ children }) => {
       setState({
         ...state,
         fetchingMessage:
-          "Data failed to load, the service may be temporarily unavailable. Please try again later.",
+          "Data failed to load, the ferry service may be temporarily unavailable. Please try again later.",
       });
     }
   };
@@ -89,6 +95,11 @@ const FerryAppStore = ({ children }) => {
     return () => clearInterval(interval);
   }, []);
   const getWeather = async () => {
+    setState({
+      ...state,
+      fetchingMessage: "Data Loading",
+      failMessage: null,
+    });
     const CITY1 = axios.get(
       "https://api.weather.gov/gridpoints/AKQ/95,27/forecast"
     );
@@ -123,11 +134,11 @@ const FerryAppStore = ({ children }) => {
           Object.assign(cityOne, { cityName: "Elizabeth City" });
           Object.assign(cityTwo, { cityName: "New Bern" });
           Object.assign(cityThree, { cityName: "Wilmington" });
-          // setCities([cityOne, cityTwo, cityThree]);
-          setState({
-            ...state,
-            cities: [cityOne, cityTwo, cityThree],
-          });
+          setCities([cityOne, cityTwo, cityThree]);
+          // setState({
+          //   ...state,
+          //   cities: [cityOne, cityTwo, cityThree],
+          // });
         })
       );
     } catch (error) {
@@ -160,6 +171,7 @@ const FerryAppStore = ({ children }) => {
         ferries,
         setFerries,
         callFerry,
+        cities,
       ]}
     >
       {children}

@@ -6,6 +6,7 @@ import ports from "./data/ports";
 import Weather from "./components/CityWeather/Weather";
 import views from "./data/views";
 import TerminalIcon from "./components/Images/TerminalIcon";
+import RouteIcon from "./components/Images/RouteIcon";
 import FerryIcon from "./components/Images/FerryIcon";
 import TwitterIcon from "./components/Images/TwitterIcon";
 import WeatherIcon from "./components/Images/WeatherIcon";
@@ -15,6 +16,7 @@ import TerminalTable from "./components/TerminalTable/TerminalTable";
 import FerryTable from "./components/FerryTable/FerryTable";
 import Contact from "./components/Contact/Contact";
 import Spinner from "./components/Spinner/Loading";
+import MapHeader from "./components/MapHeader/MapHeader";
 import PropTypes from "prop-types";
 import "./App.css";
 import {
@@ -30,6 +32,9 @@ import {
   AccordionDetails,
   Typography,
   ThemeProvider,
+  Hidden,
+  BottomNavigation,
+  BottomNavigationAction,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -54,15 +59,10 @@ const tabsHeight = "50px";
 //     url(${TransportLight}) format('ttf)
 //   `,
 // };
+const font = "'TransportNewLight',sans-serif";
 const theme = createMuiTheme({
   typography: {
-    fontFamily: [
-      "TransportNewLight",
-      "Helvetica",
-      "Arial",
-      "sans-serif",
-      '"Open Sans"',
-    ].join(","),
+    fontFamily: font,
   },
   overrides: {
     MuiCssBaseline: {
@@ -76,7 +76,7 @@ const theme = createMuiTheme({
       light: "#3f81b3",
       main: "#3072a4",
       dark: "#092940",
-      contrastText: "#fff",
+      contrastText: "#e3f2fd",
     },
     secondary: {
       light: "#d06e31",
@@ -188,7 +188,7 @@ const useStyles = makeStyles((theme) => ({
   noSmall: {
     display: "none",
     [theme.breakpoints.up("sm")]: {
-      display: "block",
+      display: "inherit",
     },
   },
   onSmallTable: {
@@ -240,7 +240,7 @@ const App = () => {
       <div id="all-content">
         <FerryAppStore>
           <div id="mapHolder">
-            <Spinner />
+            <MapHeader />
             <Map className={classes.mapHeight}></Map>
           </div>
           <div
@@ -483,7 +483,7 @@ const App = () => {
                     <Typography variant="body1" color="textSecondary">
                       provided by{" "}
                       <a href="https://www.weather.gov/" target="_blank">
-                        NWS
+                        National Weather Service
                       </a>
                     </Typography>
                   </Grid>
@@ -524,49 +524,81 @@ const App = () => {
 
           <div id="tabHolder" className={(classes.root, classes.tabContainer)}>
             <Paper>
-              <Tabs
-                value={tabValue}
-                onChange={handleTabChange}
-                variant="fullWidth"
-                indicatorColor="secondary"
-                textColor="primary"
-              >
-                <Tab
-                  className={classes.tabHeader}
-                  icon={<FerryIcon />}
-                  label="Ferries"
-                  onClick={toggleDrawer("ferryDrawer", true)}
-                />
+              <Hidden smDown>
+                <Tabs
+                  value={tabValue}
+                  onChange={handleTabChange}
+                  indicatorColor="secondary"
+                  textColor="secondary"
+                  centered
+                >
+                  <Tab
+                    className={classes.tabHeader}
+                    icon={<FerryIcon />}
+                    label="Ferries"
+                    onClick={toggleDrawer("ferryDrawer", true)}
+                  />
 
-                <Tab
-                  className={classes.tabHeader}
-                  icon={<TerminalIcon />}
-                  label="Routes"
-                  fontSize="small"
-                  onClick={toggleDrawer("terminalDrawer", true)}
-                />
+                  <Tab
+                    className={classes.tabHeader}
+                    icon={<RouteIcon />}
+                    label="Routes"
+                    fontSize="small"
+                    onClick={toggleDrawer("terminalDrawer", true)}
+                  />
 
-                <Tab
-                  className={(classes.noSmall, classes.tabHeader)}
-                  icon={<TwitterIcon />}
-                  label="Twitter"
-                  fontSize="small"
-                  onClick={toggleDrawer("twitterDrawer", true)}
-                />
-                <Tab
-                  className={(classes.noSmall, classes.tabHeader)}
-                  icon={<WeatherIcon />}
-                  label="Weather"
-                  onClick={toggleDrawer("weatherDrawer", true)}
-                />
+                  <Tab
+                    className={`${classes.noSmall}, ${classes.tabHeader}`}
+                    icon={<TwitterIcon />}
+                    label="Twitter"
+                    fontSize="small"
+                    onClick={toggleDrawer("twitterDrawer", true)}
+                  />
 
-                <Tab
-                  className={classes.tabHeader}
-                  icon={<LinksIcon />}
-                  label="Links"
-                  onClick={toggleDrawer("contactDrawer", true)}
-                />
-              </Tabs>
+                  <Tab
+                    className={`${classes.noSmall}, ${classes.tabHeader}`}
+                    icon={<WeatherIcon />}
+                    label="Weather"
+                    onClick={toggleDrawer("weatherDrawer", true)}
+                  />
+
+                  <Tab
+                    className={classes.tabHeader}
+                    icon={<LinksIcon />}
+                    label="Links"
+                    onClick={toggleDrawer("contactDrawer", true)}
+                  />
+                </Tabs>
+              </Hidden>
+              <Hidden mdUp>
+                <Tabs
+                  value={tabValue}
+                  onChange={handleTabChange}
+                  indicatorColor="secondary"
+                  textColor="secondary"
+                  centered
+                >
+                  <Tab
+                    className={classes.tabHeader}
+                    icon={<FerryIcon />}
+                    label="Ferries"
+                    onClick={toggleDrawer("ferryDrawer", true)}
+                  />
+                  <Tab
+                    className={classes.tabHeader}
+                    icon={<RouteIcon />}
+                    label="Routes"
+                    fontSize="small"
+                    onClick={toggleDrawer("terminalDrawer", true)}
+                  />
+                  <Tab
+                    className={classes.tabHeader}
+                    icon={<LinksIcon />}
+                    label="Links"
+                    onClick={toggleDrawer("contactDrawer", true)}
+                  />
+                </Tabs>
+              </Hidden>
             </Paper>
           </div>
         </FerryAppStore>

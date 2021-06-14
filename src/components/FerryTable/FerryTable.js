@@ -53,8 +53,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FerryTable = () => {
-  const [state, setState, currentView, setCurrentView, ferries] =
-    useContext(FerryAppContext);
+  const [state, , , setCurrentView, ferries, , ,] = useContext(FerryAppContext);
   const classes = useStyles();
   let { latitude, longitude } = ferries;
   let { tlatitude, tlongitude } = state.views;
@@ -89,11 +88,7 @@ const FerryTable = () => {
                 boat={boat}
                 title={boat.properties.VesselName}
               >
-                <TableCell
-                  component="th"
-                  scope="row"
-                  className={classes.onSmallTable}
-                >
+                <TableCell component="th" scope="row">
                   <span
                     className={classes.links}
                     latitude={boat.geometry.coordinates[1]}
@@ -119,23 +114,24 @@ const FerryTable = () => {
                   </span>
                 </TableCell>
                 <Hidden smDown>
-                  <TableCell className={classes.onSmallTable}>
-                    {boat.properties.SOG}
-                  </TableCell>
-                  <TableCell className={classes.onSmallTable}>
+                  <TableCell>{boat.properties.SOG}</TableCell>
+                  <TableCell>
                     {boat.properties.SOG === "0 knots"
-                      ? "stopped"
-                      : " underway"}
+                      ? "Stopped"
+                      : " Underway"}
                   </TableCell>
 
-                  <TableCell className={classes.onSmallTable}>
+                  <TableCell>
                     {/* <Moment format=" h:mm a, MM/DD/YY">
                     {boat.properties.Time}
                   </Moment> */}
-                    {new Date(boat.properties.Time).toLocaleTimeString()}
+                    {new Date(boat.properties.Time).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </TableCell>
                 </Hidden>
-                <TableCell className={classes.onSmallTable}>
+                <TableCell>
                   {/* <span
                     className={classes.links}
                     tlatitude={boat.geometry.coordinates[1]}
@@ -154,9 +150,12 @@ const FerryTable = () => {
                     ? boat.properties.Destination
                     : "no data reported"}
                 </TableCell>
-                <TableCell className={classes.onSmallTable}>
+                <TableCell>
                   {boat.properties.ETA !== null
-                    ? new Date(boat.properties.ETA).toLocaleTimeString()
+                    ? new Date(boat.properties.ETA).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                     : "no data reported"}
                 </TableCell>
               </TableRow>
