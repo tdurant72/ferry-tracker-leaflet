@@ -55,7 +55,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FerryTable = () => {
-  const { data, error, isLoading, isError } = useQuery("ferries", getFerries);
+  const {
+    data: ferries,
+    status,
+    error,
+    isLoading,
+    isError,
+  } = useQuery("ferries", getFerries, {
+    staleTime: 2000,
+    cacheTime: 6000,
+    refetchInterval: 60000,
+  });
   const { views, setViews, currentView, setCurrentView } =
     useContext(FerryAppContext);
   const classes = useStyles();
@@ -64,84 +74,95 @@ const FerryTable = () => {
   if (isLoading) return <h2>Loading...</h2>;
   if (isError) return <h2>Something went wrong...</h2>;
   return (
-    <div>
-      <TableContainer component={Paper} className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow className={classes.tableHeader}>
-              <TableCell className={classes.tableHeaderFont}>
-                Ferry Name
-              </TableCell>
-              <Hidden smDown>
-                <TableCell className={classes.tableHeaderFont}>Speed</TableCell>
-                <TableCell className={classes.tableHeaderFont}>
-                  Status
-                </TableCell>
+    <>
+      {status === "loading" && <h2>Loading...</h2>},
+      {status === "error" && (
+        <h4>Ferries service appears to be down try again later.</h4>
+      )}
+      ,
+      {status === "success" && (
+        <div>
+          <TableContainer component={Paper} className={classes.root}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow className={classes.tableHeader}>
+                  <TableCell className={classes.tableHeaderFont}>
+                    Ferry Name
+                  </TableCell>
+                  <Hidden smDown>
+                    <TableCell className={classes.tableHeaderFont}>
+                      Speed
+                    </TableCell>
+                    <TableCell className={classes.tableHeaderFont}>
+                      Status
+                    </TableCell>
 
-                <TableCell className={classes.tableHeaderFont}>As of</TableCell>
-              </Hidden>
-              <TableCell className={classes.tableHeaderFont}>
-                Destination
-              </TableCell>
+                    <TableCell className={classes.tableHeaderFont}>
+                      As of
+                    </TableCell>
+                  </Hidden>
+                  <TableCell className={classes.tableHeaderFont}>
+                    Destination
+                  </TableCell>
 
-              <TableCell className={classes.tableHeaderFont}>ETA</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.features.map((boat) => (
-              <TableRow
-                key={boat.id}
-                boat={boat}
-                title={boat.properties.VesselName}
-              >
-                <TableCell
-                  component="th"
-                  scope="row"
-                  className={classes.onSmallTable}
-                >
-                  <span
-                    className={classes.links}
-                    latitude={boat.geometry.coordinates[1]}
-                    longitude={boat.geometry.coordinates[0]}
-                    onClick={
-                      () =>
-                        setCurrentView([
-                          boat.geometry.coordinates[1],
-                          boat.geometry.coordinates[0],
-                          16,
-                        ])
-                      // setState({
-                      //   ...state,
-                      //   currentView: [
-                      //     boat.geometry.coordinates[1],
-                      //     boat.geometry.coordinates[0],
-                      //     16,
-                      //   ],
-                      // })
-                    }
+                  <TableCell className={classes.tableHeaderFont}>ETA</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {ferries.features.map((boat) => (
+                  <TableRow
+                    key={boat.id}
+                    boat={boat}
+                    title={boat.properties.VesselName}
                   >
-                    {boat.properties.VesselName}
-                  </span>
-                </TableCell>
-                <Hidden smDown>
-                  <TableCell className={classes.onSmallTable}>
-                    {boat.properties.SOG}
-                  </TableCell>
-                  <TableCell className={classes.onSmallTable}>
-                    {boat.properties.SOG === "0 knots"
-                      ? "stopped"
-                      : " underway"}
-                  </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.onSmallTable}
+                    >
+                      <span
+                        className={classes.links}
+                        latitude={boat.geometry.coordinates[1]}
+                        longitude={boat.geometry.coordinates[0]}
+                        onClick={
+                          () =>
+                            setCurrentView([
+                              boat.geometry.coordinates[1],
+                              boat.geometry.coordinates[0],
+                              16,
+                            ])
+                          // setState({
+                          //   ...state,
+                          //   currentView: [
+                          //     boat.geometry.coordinates[1],
+                          //     boat.geometry.coordinates[0],
+                          //     16,
+                          //   ],
+                          // })
+                        }
+                      >
+                        {boat.properties.VesselName}
+                      </span>
+                    </TableCell>
+                    <Hidden smDown>
+                      <TableCell className={classes.onSmallTable}>
+                        {boat.properties.SOG}
+                      </TableCell>
+                      <TableCell className={classes.onSmallTable}>
+                        {boat.properties.SOG === "0 knots"
+                          ? "stopped"
+                          : " underway"}
+                      </TableCell>
 
-                  <TableCell className={classes.onSmallTable}>
-                    {/* <Moment format=" h:mm a, MM/DD/YY">
+                      <TableCell className={classes.onSmallTable}>
+                        {/* <Moment format=" h:mm a, MM/DD/YY">
                     {boat.properties.Time}
                   </Moment> */}
-                    {new Date(boat.properties.Time).toLocaleTimeString()}
-                  </TableCell>
-                </Hidden>
-                <TableCell className={classes.onSmallTable}>
-                  {/* <span
+                        {new Date(boat.properties.Time).toLocaleTimeString()}
+                      </TableCell>
+                    </Hidden>
+                    <TableCell className={classes.onSmallTable}>
+                      {/* <span
                     className={classes.links}
                     tlatitude={boat.geometry.coordinates[1]}
                     tlongitude={boat.geometry.coordinates[0]}
@@ -155,23 +176,24 @@ const FerryTable = () => {
                   >
                     {boat.properties.Destination}
                   </span> */}
-                  {boat.properties.Destination !== ""
-                    ? boat.properties.Destination
-                    : "no data reported"}
-                </TableCell>
-                <TableCell className={classes.onSmallTable}>
-                  {boat.properties.ETA !== null
-                    ? new Date(boat.properties.ETA).toLocaleTimeString()
-                    : "no data reported"}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+                      {boat.properties.Destination !== ""
+                        ? boat.properties.Destination
+                        : "no data reported"}
+                    </TableCell>
+                    <TableCell className={classes.onSmallTable}>
+                      {boat.properties.ETA !== null
+                        ? new Date(boat.properties.ETA).toLocaleTimeString()
+                        : "no data reported"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
+    </>
   );
-  //   }
 };
 
 // FerryTable.propTypes = {

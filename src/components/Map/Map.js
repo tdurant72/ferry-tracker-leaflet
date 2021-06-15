@@ -1,6 +1,6 @@
 // import { useGlobalContext } from "../../contexts/GlobalContext";
 import { useQuery } from "react-query";
-// import { getFerries } from "../../calls";
+import { getFerries } from "../../calls";
 import { FerryAppContext } from "../../contexts/GlobalContext";
 import { key } from "../../key";
 import ports from "../../data/ports";
@@ -32,16 +32,16 @@ const LegendBody = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 20px;
 `;
-const getFerries = async () => {
-  const response = await fetch(
-    `https://qc.eapps.ncdot.gov/services/ferrytrackerservice-dev/TrackerData`
-  );
-  if (!response.ok) {
-    throw new Error("Something went wrong");
-  }
-  console.log("call made to ferries");
-  return response.json();
-};
+// const getFerries = async () => {
+//   const response = await fetch(
+//     `https://qc.eapps.ncdot.gov/services/ferrytrackerservice-dev/TrackerData`
+//   );
+//   if (!response.ok) {
+//     throw new Error("Something went wrong");
+//   }
+//   console.log("call made to ferries");
+//   return response.json();
+// };
 const Map = () => {
   const {
     data: ferryData,
@@ -276,7 +276,7 @@ const Map = () => {
   // if (isError) return ;
   return (
     <>
-      {status === "loading" && <h2>Loading...</h2>},
+      {/* {status === "loading" && <h2>Loading...</h2>}, */}
       {status == "error" && <h2>Something went wrong...</h2>},
       {status === "success" && (
         <Wrapper width="100VW" height="100vh" id="bingmap" ref={mapRef} />

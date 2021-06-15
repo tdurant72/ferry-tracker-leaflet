@@ -1,13 +1,15 @@
 import axios from "axios";
 export const getFerries = async () => {
-  const response = await fetch(
-    `https://qc.eapps.ncdot.gov/services/ferrytrackerservice-dev/TrackerData`
-  );
-  if (!response.ok) {
-    throw new Error("Something went wrong");
+  try {
+    const ferries = await (
+      await fetch(
+        `https://qc.eapps.ncdot.gov/services/ferrytrackerservice-dev/TrackerData`
+      )
+    ).json();
+    return ferries;
+  } catch (error) {
+    console.log(error);
   }
-  console.log("call made to ferries");
-  return response.json();
 };
 // export const getCityOne = async () => {
 //   const resCO = await fetch(
