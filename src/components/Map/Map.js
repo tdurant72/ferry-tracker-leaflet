@@ -5,7 +5,7 @@ import ports from "../../data/ports";
 import movingIcon from "../Images/ferry-icon.png";
 import dockedIcon from "../Images/docked.png";
 import terminalIcon from "../Images/terminal.png";
-
+import TransportLight from "../../fonts/TransportNewLight_gdi.ttf";
 import React, { useEffect, useState, useRef, useContext } from "react";
 import L from "leaflet";
 
@@ -30,7 +30,7 @@ const LegendBody = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 20px;
 `;
-
+const font = TransportLight;
 const Map = () => {
   // const { ferries, timeStamp } = useGlobalContext();
   // const { currentView } = useContext(AppContext);
@@ -102,21 +102,23 @@ const Map = () => {
         icon: terminal,
       })
         .bindPopup(
-          `<div style='text-align:center;font-size:14px;'><strong>${
+          `<div style='text-align:center;font-size:14px; font-family:${font}'><h3 style="margin-bottom:0;">${
             port.properties.title
           }
-             </strong> <br/><a href="tel:${portNum}"> Phone: ${formatPhoneNumber(
+             </h3> <p style="margin:7px 0; font-size:14px;"> <a href="tel:${portNum}"> Phone: ${formatPhoneNumber(
             portNum
-          )}</a>
-             <br/> ${port.properties.address}
+          )}</a></p>
+             <p style="margin:7px 0; font-size:14px;"> ${
+               port.properties.address
+             }</p>
              ${
                port.properties.Site !== null
-                 ? `<br/><a href="${port.properties.Site}" target="_blank">Visitor Information</a> `
+                 ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Site}" target="_blank">Visitor Information</a></p> `
                  : ``
              }
              ${
                port.properties.Reservations !== null
-                 ? `<br/><a href="${port.properties.Reservations}" target="_blank">Next-Day Ferry Reservations</a> `
+                 ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Reservations}" target="_blank">Next-Day Ferry Reservations</a></p> `
                  : ``
              }
               </div>`
@@ -198,7 +200,22 @@ const Map = () => {
           icon: ferryDockedIcon,
         })
           .bindPopup(
-            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${ferry.properties.VesselName}</strong></h3> <br/><p style="text-align:left;margin-bottom:0;font-size:14px;">${ferry.properties.summary}</p>`
+            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${
+              ferry.properties.VesselName
+            }</strong><br/><p style="margin:7px 0; font-size:14px;"> Destination: ${
+              ferry.properties.Destination !== ""
+                ? ferry.properties.Destination
+                : "No destination reported"
+            }</p><br/><p style="margin:7px 0; font-size:14px;">ETA: ${
+              ferry.properties.ETA !== null
+                ? new Date(ferry.properties.ETA).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "No ETA reported"
+            }</p><p style="margin:7px 0;font-size:14px;"> Speed: ${
+              ferry.properties.SOG
+            }</p>`
           )
           .addTo(ferryOverlay);
       } else {
@@ -208,7 +225,22 @@ const Map = () => {
           rotationOrigin: "center",
         })
           .bindPopup(
-            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${ferry.properties.VesselName}</strong></h3> <br/><p style="text-align:left;margin-top:0; font-size:14px;">${ferry.properties.summary}</p>`
+            `<div><h3 style="text-align:center;margin-bottom:0;"><strong>${
+              ferry.properties.VesselName
+            }</strong></h3><p style="margin:7px 0; font-size:14px;"> Destination: ${
+              ferry.properties.Destination !== ""
+                ? ferry.properties.Destination
+                : "No destination reported"
+            }</p><p style="margin:7px 0; ; font-size:14px;">ETA: ${
+              ferry.properties.ETA !== null
+                ? new Date(ferry.properties.ETA).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "No ETA reported"
+            }</p><p style="margin:7px 0; font-size:14px;"> Speed: ${
+              ferry.properties.SOG
+            }</p>`
           )
 
           .addTo(ferryOverlay);
