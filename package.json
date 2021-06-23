@@ -22,7 +22,7 @@
     "react-bingmaps": "^3.6.1",
     "react-dom": "^17.0.2",
     "react-leaflet": "^3.1.0",
-    "react-leaflet-bing-v2": "^5.0.1",
+    "react-leaflet-bing-v2": "^5.2.2",
     "react-moment": "^1.1.1",
     "react-query": "^3.16.1",
     "react-scripts": "4.0.3",

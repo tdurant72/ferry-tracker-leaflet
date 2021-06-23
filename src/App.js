@@ -42,6 +42,7 @@ import { Timeline } from "react-twitter-widgets";
 import { React, useState } from "react";
 
 import Map from "./components/Map/Map";
+import BingMap from "./components/Map/BingMap";
 import TransportNewLight from "./fonts/TransportNewLight_gdi.ttf";
 import TransportNewMedium from "./fonts/TransportNewMedium_gdi.ttf";
 require("leaflet-plugins/layer/tile/Bing.js");
@@ -241,7 +242,8 @@ const App = () => {
         <FerryAppStore>
           <div id="mapHolder">
             <MapHeader />
-            <Map className={classes.mapHeight}></Map>
+            {/* <Map className={classes.mapHeight}></Map> */}
+            <BingMap />
           </div>
           <div
             id="drawers"
