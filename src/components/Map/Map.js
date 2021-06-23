@@ -37,6 +37,7 @@ const Map = () => {
   const [state, setState, currentView, setCurrentView, ferries] =
     useContext(FerryAppContext);
   console.log("currentView", currentView);
+  const [draggedView, setDraggedView] = useState([]);
 
   console.log("initial currentView value", currentView);
 
@@ -73,10 +74,27 @@ const Map = () => {
     style: function (feature) {
       switch (feature.properties.Type) {
         case "Daily":
-          return { color: "#00cc00", weight: 2, opacity: 0.5 };
+          return {
+            color: "#00cc00",
+            weight: 4,
+            dashArray: "20,15",
+            opacity: 0.5,
+            lineJoin: "round",
+          };
         case "Emergency":
-          return { color: "#cc3300", weight: 2, opacity: 0.5 };
+          return {
+            color: "#cc3300",
+            weight: 4,
+            dashArray: "20,15",
+            opacity: 0.5,
+            lineJoin: "round",
+          };
       }
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(
+        `<div style='text-align:center;font-size:14px; font-family:${font}'><h3 style="margin-bottom:0;">${feature.properties.ROUTE}</h3><p style="margin:7px 0; font-size:14px;">Length: ${feature.properties.LengthMile} miles</p><p style="margin:7px 0; font-size:14px;">Usage: ${feature.properties.Type}</p></div>`
+      );
     },
   });
   let legend = L.control({ position: "bottomright" });
@@ -118,7 +136,7 @@ const Map = () => {
              }
              ${
                port.properties.Reservations !== null
-                 ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Reservations}" target="_blank">Next-Day Ferry Reservations</a></p> `
+                 ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Reservations}" target="_blank">Ferry Reservations</a></p> `
                  : ``
              }
               </div>`
@@ -140,7 +158,19 @@ const Map = () => {
     ferryMap = new L.map("bingmap", {
       layers: [portOverlay, ferryOverlay, ferryRoutesOverlay],
     }).setView([currentView[0], currentView[1]], currentView[2]);
-
+    ferryMap.on("dragend", function (e) {
+      let fmZoom = ferryMap.getZoom();
+      let fmCenter = ferryMap.getCenter();
+      console.log("click: ", "latlng:", e.latlng, e);
+      setCurrentView([fmCenter.lat, fmCenter.lng, fmZoom]);
+    });
+    // ferryMap.on("moveend", function () {
+    //   let fmZoom = ferryMap.getZoom();
+    //   let fmCen = ferryMap.getCenter();
+    //   // console.log("event:", [e.latlng.lat, e.latlng.lng], fmZoom);
+    //   console.log("event:", fmCen, fmZoom);
+    //   setCurrentView([fmCen.lng, fmCen.lat, fmZoom]);
+    // });
     const mapOptions = {
       bingMapsKey: apiKey,
       imagerySet: "RoadOnDemand",
@@ -246,6 +276,7 @@ const Map = () => {
           .addTo(ferryOverlay);
       }
     });
+    console.log("create ferry markers run");
   };
 
   const centerMapView = () => {
@@ -258,6 +289,9 @@ const Map = () => {
       let zoom = currentView[2];
 
       ferryMapState.setView([currentView[0], currentView[1]], currentView[2]);
+      let msCenter = ferryMapState.getCenter();
+      let msZoom = ferryMapState.getZoom();
+      console.log("center:", msCenter, "zoom:", msZoom);
       // setState({
       //   ...state,
       //   currentView: [
@@ -268,6 +302,24 @@ const Map = () => {
       // });
     }
   };
+  const onMapClick = (e) => {
+    // let msCenter = ferryMapState.getCenter();
+    // let msZoom = ferryMapState.getZoom();
+    let fmZoom = ferryMap.getZoom();
+    let fmCen = ferryMap.getCenter();
+    setDraggedView([fmCen.lng, fmCen.lat, fmZoom]);
+    if (currentView !== draggedView) {
+      console.log("views not equal");
+      // setCurrentView([fmCen.lng, fmCen.lat, fmZoom]);
+    } else {
+      console.log("views not equal");
+    }
+    // console.log("event:", [e.latlng.lat, e.latlng.lng], fmZoom);
+    console.log("drag data:", fmCen.lng, fmCen.lat, fmZoom);
+    // setCurrentView([fmCen.lng, fmCen.lat, fmZoom]);
+    // let mData = ferryMap.getCenter();
+    // console.log("mData:", mData, e);
+  };
   useEffect(() => {
     createFerryMarkers();
     centerMapView();
@@ -275,9 +327,9 @@ const Map = () => {
     //   cleanup
     // }
   }, [state.timeStamp, currentView]);
-  // useEffect(() => {
-  //   centerMapView();
-  // }, [updatedView]);
+  useEffect(() => {
+    ferryMap.on("moveend", onMapClick);
+  }, []);
 
   return <Wrapper width="100VW" height="100vh" id="bingmap" ref={mapRef} />;
 };

@@ -12,7 +12,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 1,
           OBJECTID: 1,
-          ROUTE: "Ft Fisher to Southport",
+          ROUTE: "Ft Fisher / Southport",
           SHAPE_Leng: 20879.0258889,
           LengthMile: 4,
           Type: "Daily",
@@ -53,7 +53,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 2,
           OBJECTID: 3,
-          ROUTE: "Stumpy Point to Rodanthe",
+          ROUTE: "Stumpy Point / Rodanthe",
           SHAPE_Leng: 102829.21121,
           LengthMile: 19,
           Type: "Emergency",
@@ -203,7 +203,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 3,
           OBJECTID: 4,
-          ROUTE: "Currituck to Knotts Island",
+          ROUTE: "Currituck / Knotts Island",
           SHAPE_Leng: 28549.242809399999,
           LengthMile: 5,
           Type: "Daily",
@@ -308,7 +308,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 4,
           OBJECTID: 5,
-          ROUTE: "Cedar Island to Ocracoke",
+          ROUTE: "Cedar Island / Ocracoke",
           SHAPE_Leng: 137512.528414,
           LengthMile: 13,
           Type: "Daily",
@@ -397,7 +397,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 5,
           OBJECTID: 6,
-          ROUTE: "Ocracoke to Swan Quarter",
+          ROUTE: "Ocracoke / Swan Quarter",
           SHAPE_Leng: 160615.23726600001,
           LengthMile: 30,
           Type: "Daily",
@@ -482,7 +482,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 6,
           OBJECTID: 7,
-          ROUTE: "Aurora to Bayview",
+          ROUTE: "Aurora / Bayview",
           SHAPE_Leng: 20586.355147400001,
           LengthMile: 4,
           Type: "Daily",
@@ -531,7 +531,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 7,
           OBJECTID: 8,
-          ROUTE: "Cherry Branch to Minnesott",
+          ROUTE: "Cherry Branch / Minnesott",
           SHAPE_Leng: 11669.6538174,
           LengthMile: 2,
           Type: "Daily",
@@ -583,7 +583,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 8,
           OBJECTID: 10,
-          ROUTE: "Ocracoke to Hatteras",
+          ROUTE: "Ocracoke / Hatteras",
           SHAPE_Leng: 39417.971537899997,
           LengthMile: 10,
           Type: "Daily",
@@ -652,7 +652,7 @@ const ferryRoutes = [
         properties: {
           OBJECTID_1: 9,
           OBJECTID: 11,
-          ROUTE: "Ocracoke to Hatteras",
+          ROUTE: "Ocracoke / Hatteras",
           SHAPE_Leng: 10888.0169229,
           LengthMile: 2,
           Type: "Daily",
