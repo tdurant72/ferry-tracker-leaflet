@@ -2,9 +2,9 @@ import axios from "axios";
 // import DrawerContextProvider from "./contexts/DrawerContext";
 import { useQuery } from "react-query";
 import FerryAppStore from "./contexts/GlobalContext";
-import ports from "./data/ports";
-import Weather from "./components/CityWeather/Weather";
+// import Weather from "./components/CityWeather/Weather";
 import views from "./data/views";
+import ports from "./data/ports";
 import TerminalIcon from "./components/Images/TerminalIcon";
 import RouteIcon from "./components/Images/RouteIcon";
 import FerryIcon from "./components/Images/FerryIcon";
@@ -12,13 +12,15 @@ import TwitterIcon from "./components/Images/TwitterIcon";
 import WeatherIcon from "./components/Images/WeatherIcon";
 import LinksIcon from "./components/Images/LinksIcon";
 import CityWeather from "./components/CityWeather/CityWeather";
-import TerminalTable from "./components/TerminalTable/TerminalTable";
-import FerryTable from "./components/FerryTable/FerryTable";
-import Contact from "./components/Contact/Contact";
 import Spinner from "./components/Spinner/Loading";
 import MapHeader from "./components/MapHeader/MapHeader";
 import PropTypes from "prop-types";
 import "./App.css";
+// import TerminalTable from "./components/TerminalTable/TerminalTable";
+// import FerryTable from "./components/FerryTable/FerryTable";
+
+// import Contact from "./components/Contact/Contact";
+
 import {
   Drawer,
   Paper,
@@ -39,13 +41,22 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Timeline } from "react-twitter-widgets";
-import { React, useState } from "react";
+import React, { useState, Suspense } from "react";
 
 import Map from "./components/Map/Map";
 import TransportNewLight from "./fonts/TransportNewLight_gdi.ttf";
 import TransportNewMedium from "./fonts/TransportNewMedium_gdi.ttf";
 require("leaflet-plugins/layer/tile/Bing.js");
 
+const Contact = React.lazy(() => import("./components/Contact/Contact"));
+
+const Weather = React.lazy(() => import("./components/CityWeather/Weather"));
+const TerminalTable = React.lazy(() =>
+  import("./components/TerminalTable/TerminalTable")
+);
+const FerryTable = React.lazy(() =>
+  import("./components/FerryTable/FerryTable")
+);
 const drawerWidth = "auto";
 const tabsHeight = "50px";
 
@@ -263,7 +274,9 @@ const App = () => {
                 onKeyDown={toggleDrawer("terminalDrawer", false)}
               />
               <div className="viewDrawer">
-                <TerminalTable />
+                <Suspense fallback={<div>Loading Terminal Table...</div>}>
+                  <TerminalTable />
+                </Suspense>
               </div>
             </Drawer>
             <Drawer
@@ -281,7 +294,9 @@ const App = () => {
                 onKeyDown={toggleDrawer("ferryDrawer", false)}
               />
               <div className="FerryTable">
-                <FerryTable />
+                <Suspense fallback={<div>Loading Ferry Table...</div>}>
+                  <FerryTable />
+                </Suspense>
               </div>
             </Drawer>
 
@@ -488,7 +503,11 @@ const App = () => {
                     </Typography>
                   </Grid>
                 </Grid>
-                <Weather />
+                <>
+                  <Suspense fallback={<div>Loading Weather...</div>}>
+                    <Weather />
+                  </Suspense>
+                </>
               </div>
             </Drawer>
             <Drawer
@@ -517,7 +536,11 @@ const App = () => {
                     </Typography>
                   </Grid>
                 </Grid>
-                <Contact />
+                <>
+                  <Suspense fallback={<div>Loading Links...</div>}>
+                    <Contact />
+                  </Suspense>
+                </>
               </div>
             </Drawer>
           </div>
