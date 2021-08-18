@@ -11,8 +11,10 @@ import views from "../data/views";
 
 export const FerryAppContext = createContext();
 const ferryUrl =
-  "https://qc.eapps.ncdot.gov/services/ferrytrackerservice-dev/TrackerData";
+  "https://qc.eapps.ncdot.gov/services/ferrytracker-service-test/TrackerData";
+// "https://qc.eapps.ncdot.gov/services/ferrytrackerservice-dev/TrackerData";
 // const ferryUrl = "https://gist14.dot.nc.net/Ncdotferryfeed/FerryGeoJson.ashx";
+// const ferryUrl = "https://qc.eapps.ncdot.gov/services/ferrytracker-service-test/TrackerData";
 
 const initState = {
   routes: [],
@@ -35,6 +37,7 @@ const FerryAppStore = ({ children }) => {
   const [cities, setCities] = useState([]);
   const [currentView, setCurrentView] = useState([35.264277, -76.833359, 8]);
   //   const [routes, setRoutes] = useState([]);
+  const [ferriesLoaded, setFerriesLoaded] = useState(false);
   const [state, setState] = useState(initState);
 
   const getNCFerries = async () => {
@@ -54,34 +57,34 @@ const FerryAppStore = ({ children }) => {
       },
     });
     try {
-      axios.get(ferryUrl, { timeout: 2000 }).then((response) => {
-        // let time = Date.now();
-        // setRoutes(views);
-        // setFerries(response.data.features);
-        // setCallFerry(true);
-        // setLoading(false);
-        // setFetchingMessage(null);
-        // setTimeStamp(newTime.toLocaleTimeString());
-        setState({
-          ...state,
-          callFerry: true,
-          isLoading: false,
-          fetchingMessage: null,
-          // ferries: response.data.features,
-          timeStamp: newTime.toLocaleTimeString(),
-          views: views,
+      axios
+        .get(ferryUrl, { timeout: 2000 })
+        .then((response) => {
+          setState({
+            ...state,
+            callFerry: true,
+            isLoading: false,
+            fetchingMessage: null,
+            // ferries: response.data.features,
+            timeStamp: newTime.toLocaleTimeString(),
+            views: views,
+          });
+          setFerries(response.data.features);
+          setCallFerry(false);
+          console.log("state from axios call:", state);
+          setFerriesLoaded(true);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          setState({
+            ...state,
+            fetchingMessage:
+              "Error: Ferry vessel data failed to load. The ferry location service may be temporarily unavailable. Please try again later",
+            failMessage: `${error}`,
+          });
         });
-        setFerries(response.data.features);
-        setCallFerry(false);
-        // console.log(state);
-      });
     } catch (error) {
-      console.log("error", error);
-      setState({
-        ...state,
-        fetchingMessage:
-          "Data failed to load, the ferry service may be temporarily unavailable. Please try again later.",
-      });
+      console.log("error", state.failMessage);
     }
   };
 
@@ -118,38 +121,41 @@ const FerryAppStore = ({ children }) => {
       },
     });
     try {
-      axios.all([CITY1, CITY2, CITY3], { timeout: 2000 }).then(
-        axios.spread((res1, res2, res3) => {
-          let cityOne = res1.data.properties.periods[0];
-          let cityTwo = res2.data.properties.periods[0];
-          let cityThree = res3.data.properties.periods[0];
-          console.log(
-            "city 1",
-            cityOne,
-            "city 2",
-            cityTwo,
-            "city 3",
-            cityThree
-          );
-          Object.assign(cityOne, { cityName: "Elizabeth City" });
-          Object.assign(cityTwo, { cityName: "New Bern" });
-          Object.assign(cityThree, { cityName: "Wilmington" });
-          setCities([cityOne, cityTwo, cityThree]);
-          // setState({
-          //   ...state,
-          //   cities: [cityOne, cityTwo, cityThree],
-          // });
-        })
-      );
+      axios
+        .all([CITY1, CITY2, CITY3], { timeout: 2000 })
+        .then(
+          axios.spread((res1, res2, res3) => {
+            let cityOne = res1.data.properties.periods[0];
+            let cityTwo = res2.data.properties.periods[0];
+            let cityThree = res3.data.properties.periods[0];
+            console.log(
+              "city 1",
+              cityOne,
+              "city 2",
+              cityTwo,
+              "city 3",
+              cityThree
+            );
+            Object.assign(cityOne, { cityName: "Elizabeth City" });
+            Object.assign(cityTwo, { cityName: "New Bern" });
+            Object.assign(cityThree, { cityName: "Wilmington" });
+            setCities([cityOne, cityTwo, cityThree]);
+            // setState({
+            //   ...state,
+            //   cities: [cityOne, cityTwo, cityThree],
+            // });
+          })
+        )
+        .catch((error) => {
+          setState({
+            ...state,
+            fetchingMessage:
+              "Weather data failed to load, the service may be temporarily unavailable. Please try again later.",
+            failMessage: `${error}`,
+          });
+        });
     } catch (error) {
-      setState({
-        ...state,
-        fetchingMessage:
-          "Weather data failed to load, the service may be temporarily unavailable. Please try again later.",
-      });
-      //   setFetchingMessage(
-      //     "Weather data failed to load, the service may be temporarily unavailable. Please try again later."
-      //   );
+      console.log(state.failMessage);
     }
   };
 
@@ -172,6 +178,7 @@ const FerryAppStore = ({ children }) => {
         setFerries,
         callFerry,
         cities,
+        ferriesLoaded,
       ]}
     >
       {children}

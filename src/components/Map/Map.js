@@ -2,9 +2,18 @@
 import { FerryAppContext } from "../../contexts/GlobalContext";
 import { key } from "../../key";
 import ports from "../../data/ports";
+import cameras from "../../data/cameras";
 import movingIcon from "../Images/ferry-icon.png";
 import dockedIcon from "../Images/docked.png";
 import terminalIcon from "../Images/terminal.png";
+import ferrySvg from "../Images/ferry.svg";
+import dockedSvg from "../Images/dockedFerry.svg";
+import emergencySvg from "../Images/emergencyTerminal.svg";
+import terminalSvg from "../Images/terminal.svg";
+import terminalCallout from "../Images/terminalCallout.svg";
+import maintenanceSvg from "../Images/maintenanceTerminal.svg";
+import cameraSvg from "../Images/camera.svg";
+import maintenanceIcon from "../Images/maintenanceTerminal.png";
 import TransportLight from "../../fonts/TransportNewLight_gdi.ttf";
 import React, { useEffect, useState, useRef, useContext } from "react";
 import L from "leaflet";
@@ -15,15 +24,36 @@ import "leaflet-rotatedmarker";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
 import styled from "styled-components";
+import { CameraAlt } from "@material-ui/icons";
 require("leaflet-bing-layer");
 
-const Wrapper = styled.div`
-  width: ${(props) => props.width};
-  height: ${(props) => `calc(${props.height} - 150px)`};
+const Wrapper = styled.div.attrs({
+  className: "map",
+})`
+  /* width: ${(props) => props.width};
+  height: ${(props) => `calc(${props.height} - 150px)`}; */
+
+  &.map {
+    height: 700px;
+  }
+
+  &.map {
+    @media screen and (max-width: 768px) {
+      height: ${() => `calc(100vh - 380px)`};
+    }
+  }
+
+  /* height: 500px;
+  width: 700px; */
 `;
 const Legend = styled.div`
-  width: 800px;
+  width: 200px;
   height: 200px;
+  display: block;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 const LegendBody = styled.div`
   display: grid;
@@ -34,21 +64,34 @@ const font = TransportLight;
 const Map = () => {
   // const { ferries, timeStamp } = useGlobalContext();
   // const { currentView } = useContext(AppContext);
-  const [state, setState, currentView, setCurrentView, ferries] =
+  const [state, , currentView, setCurrentView, ferries, , , , ferriesLoaded] =
     useContext(FerryAppContext);
-  console.log("currentView", currentView);
+  // console.log("currentView", currentView);
   const [draggedView, setDraggedView] = useState([]);
 
-  console.log("initial currentView value", currentView);
+  // console.log("initial currentView value", currentView);
 
   const ferryUrl = "https://gist14.dot.nc.net/Ncdotferryfeed/FerryGeoJson.ashx";
   // const ferryUrl = "https://gisd14.dot.nc.net/Ncdotferryfeed/ferrygeojson.ashx";
   const terminal = L.icon({
-    iconUrl: "/terminal.svg",
+    iconUrl: terminalCallout,
+    iconSize: [25, 25],
+    // iconAnchor: [0, 20],
+  });
+  const ferryCamera = L.icon({
+    iconUrl: cameraSvg,
+    iconSize: [15, 15],
+  });
+  const emergencyTerminal = L.icon({
+    iconUrl: emergencySvg,
+    iconSize: [20, 20],
+  });
+  const maintenanceTerminal = L.icon({
+    iconUrl: maintenanceSvg,
     iconSize: [20, 20],
   });
   const ferryIcon = new L.icon({
-    iconUrl: "/ferry.svg",
+    iconUrl: ferrySvg,
     iconSize: [15, 15],
     options: {
       customId: "",
@@ -56,7 +99,7 @@ const Map = () => {
   });
 
   const ferryDockedIcon = L.icon({
-    iconUrl: "/dockedFerry.svg",
+    iconUrl: dockedSvg,
     iconSize: [15, 15],
   });
 
@@ -65,6 +108,7 @@ const Map = () => {
   const [mapCenter, setMapCenter] = useState(null);
   const [ferryMapState, setFerryMapState] = useState(null);
   let portOverlay = L.layerGroup();
+  let cameraOverlay = L.layerGroup();
   let routeStyles = {
     color: "#00cc00",
     weight: 2,
@@ -103,11 +147,13 @@ const Map = () => {
   const [ferryOverlay, setFerryOverlay] = useState(L.layerGroup());
 
   const createMap = () => {
-    console.log("createMap called");
+    // console.log("cameras", cameras, "ports", ports);
+    createFerryMarkers();
     const apiKey = key;
     ports.forEach((port) => {
       const portID = port.properties.title;
       const portNum = port.properties.phone;
+      const portType = port.properties.type;
       let formatPhoneNumber = (str) => {
         let cleaned = ("" + str).replace(/\D/g, "");
         let match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
@@ -116,16 +162,81 @@ const Map = () => {
         }
         return null;
       };
-      L.marker([port.geometry.coordinates[1], port.geometry.coordinates[0]], {
-        icon: terminal,
-      })
-        .bindPopup(
-          `<div style='text-align:center;font-size:14px; font-family:${font}'><h3 style="margin-bottom:0;">${
-            port.properties.title
-          }
+      if (portType === "daily")
+        L.marker([port.geometry.coordinates[1], port.geometry.coordinates[0]], {
+          icon: terminal,
+        })
+          .bindPopup(
+            `<div style='text-align:center;font-size:14px; font-family:${font}'><h3 style="margin-bottom:0;">${
+              port.properties.title
+            }
+           </h3> <p style="margin:7px 0; font-size:14px;"> <a href="tel:${portNum}"> Phone: ${formatPhoneNumber(
+              portNum
+            )}</a></p>
+           <p style="margin:7px 0; font-size:14px;"> ${
+             port.properties.address
+           }</p>
+           ${
+             port.properties.Site !== null
+               ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Site}" target="_blank">Visitor Information</a></p> `
+               : ``
+           }
+           ${
+             port.properties.Reservations !== null
+               ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Reservations}" target="_blank">Ferry Reservations</a></p> `
+               : ``
+           }
+           ${
+             port.properties.schedule !== null
+               ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.schedule}" target="_blank">Ferry Schedule</a></p>`
+               : null
+           }
+            </div>`
+          )
+          .addTo(portOverlay);
+      if (portType === "emergency")
+        L.marker([port.geometry.coordinates[1], port.geometry.coordinates[0]], {
+          icon: emergencyTerminal,
+        })
+          .bindPopup(
+            `<div style='text-align:center;font-size:14px; font-family:${font}'><h3 style="margin-bottom:0;">${
+              port.properties.title
+            }
+           </h3>${
+             port.properties.phone !== null
+               ? `<p style="margin:7px 0; font-size:14px;"> <a href="tel:${portNum}"> Phone: ${formatPhoneNumber(
+                   portNum
+                 )}</a></p>`
+               : ``
+           } 
+           <p style="margin:7px 0; font-size:14px;"> ${
+             port.properties.address
+           }</p>
+           ${
+             port.properties.Site !== null
+               ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Site}" target="_blank">Visitor Information</a></p> `
+               : ``
+           }
+           ${
+             port.properties.Reservations !== null
+               ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Reservations}" target="_blank">Ferry Reservations</a></p>`
+               : ``
+           }
+           
+            </div>`
+          )
+          .addTo(portOverlay);
+      if (portType === "maintenance")
+        L.marker([port.geometry.coordinates[1], port.geometry.coordinates[0]], {
+          icon: maintenanceTerminal,
+        })
+          .bindPopup(
+            `<div style='text-align:center;font-size:14px; font-family:${font}'><h3 style="margin-bottom:0;">${
+              port.properties.title
+            }
              </h3> <p style="margin:7px 0; font-size:14px;"> <a href="tel:${portNum}"> Phone: ${formatPhoneNumber(
-            portNum
-          )}</a></p>
+              portNum
+            )}</a></p>
              <p style="margin:7px 0; font-size:14px;"> ${
                port.properties.address
              }</p>
@@ -139,29 +250,38 @@ const Map = () => {
                  ? `<p style="margin:7px 0; font-size:14px;"> <a href="${port.properties.Reservations}" target="_blank">Ferry Reservations</a></p> `
                  : ``
              }
+             <h4>Restricted Access</h4>
               </div>`
+          )
+          .addTo(portOverlay);
+    });
+    cameras.forEach((camera) => {
+      const cameraUrl = camera.properties.camera;
+      const cameraTitle = camera.properties.title;
+      L.marker(
+        [camera.geometry.coordinates[1], camera.geometry.coordinates[0]],
+        { icon: ferryCamera }
+      )
+        .bindPopup(
+          `<div><h3>${cameraTitle}</h3> <img style="heigh:100%; width:300px;" src='${cameraUrl}' alt='${cameraTitle}'/></div>`
         )
-        // .bindPopup(
-        //   "<div style='text-align:center;'><strong>" +
-        //     port.properties.title +
-        //     "</strong> <br/> phone: " +
-        //     port.properties.phone +
-        //     "<br/> address: " +
-        //     port.properties.address +
-        //     "<br/> Visitor Information:"+
-        //     port.properties.Site+
-        //     "</div>"
-        // )
-        .addTo(portOverlay);
+        .addTo(cameraOverlay);
     });
 
     ferryMap = new L.map("bingmap", {
       layers: [portOverlay, ferryOverlay, ferryRoutesOverlay],
     }).setView([currentView[0], currentView[1]], currentView[2]);
+
     ferryMap.on("dragend", function (e) {
       let fmZoom = ferryMap.getZoom();
       let fmCenter = ferryMap.getCenter();
-      console.log("click: ", "latlng:", e.latlng, e);
+      // console.log("click: ", "latlng:", e.latlng, e);
+      setCurrentView([fmCenter.lat, fmCenter.lng, fmZoom]);
+    });
+    ferryMap.on("zoomend", function (e) {
+      let fmZoom = ferryMap.getZoom();
+      let fmCenter = ferryMap.getCenter();
+      // console.log("click: ", "latlng:", e.latlng, e);
       setCurrentView([fmCenter.lat, fmCenter.lng, fmZoom]);
     });
     // ferryMap.on("moveend", function () {
@@ -188,6 +308,7 @@ const Map = () => {
         <i class="icon" style="background-image: url(${movingIcon});background-repeat: no-repeat;background-position:center;"></i><span>Ferry Underway</span><br>
                       <i class="icon" style="background-image: url(${dockedIcon});background-repeat: no-repeat;background-position:center;"></i><span>Ferry Stopped</span><br>
                       <i class="icon" style="background-image: url(${terminalIcon});background-repeat: no-repeat;background-position:center;"></i><span>Terminals</span><br>
+                      <i class="icon" style="background-image: url(${maintenanceIcon});background-repeat: no-repeat;background-position:center;"></i><span>Boat Yard</span><br>
                       <i style="background: #00cc00"></i><span>Daily Route</span><br>
                       <i style="background: #cc3300"></i><span>Emergency Route</span><br>                   
                       `;
@@ -203,20 +324,9 @@ const Map = () => {
     setFerryMapState(ferryMap);
   };
 
-  useEffect(() => {
-    console.log("useeffect called for createMap", ferries);
-    createMap();
-    // createFerryMarkers();
-    return () => {
-      // console.log("ferryMap", ferryMap, "ferryOverlay", ferryOverlay);
-      if (ferryMap !== null) {
-        ferryMap.remove();
-      }
-    };
-  }, []);
-
   const createFerryMarkers = () => {
     ferryOverlay.clearLayers();
+
     ferries.forEach((ferry) => {
       let COG = ferry.properties.COG;
       let SOG = ferry.properties.SOG;
@@ -225,7 +335,7 @@ const Map = () => {
         ferry.geometry.coordinates[1],
         ferry.geometry.coordinates[0]
       );
-      if (SOG == "0 knots") {
+      if (ferry.properties.NavigationalStatus !== "under way using engine") {
         L.marker(latlang, {
           icon: ferryDockedIcon,
         })
@@ -321,6 +431,18 @@ const Map = () => {
     // console.log("mData:", mData, e);
   };
   useEffect(() => {
+    console.log("useeffect called for createMap", ferries);
+    createMap();
+
+    // createFerryMarkers();
+    return () => {
+      // console.log("ferryMap", ferryMap, "ferryOverlay", ferryOverlay);
+      if (ferryMap !== null) {
+        ferryMap.remove();
+      }
+    };
+  }, [ferriesLoaded]);
+  useEffect(() => {
     createFerryMarkers();
     centerMapView();
     // return () => {
@@ -331,6 +453,14 @@ const Map = () => {
     ferryMap.on("moveend", onMapClick);
   }, []);
 
-  return <Wrapper width="100VW" height="100vh" id="bingmap" ref={mapRef} />;
+  return (
+    <>
+      {ferries ? (
+        <Wrapper id="bingmap" className="map" ref={mapRef} />
+      ) : (
+        <h2>Loading Data...</h2>
+      )}
+    </>
+  );
 };
 export default Map;

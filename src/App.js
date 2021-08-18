@@ -1,7 +1,7 @@
 import axios from "axios";
 // import DrawerContextProvider from "./contexts/DrawerContext";
 import { useQuery } from "react-query";
-import FerryAppStore from "./contexts/GlobalContext";
+import FerryAppStore, { FerryAppContext } from "./contexts/GlobalContext";
 // import Weather from "./components/CityWeather/Weather";
 import views from "./data/views";
 import ports from "./data/ports";
@@ -14,6 +14,11 @@ import LinksIcon from "./components/Images/LinksIcon";
 import CityWeather from "./components/CityWeather/CityWeather";
 import Spinner from "./components/Spinner/Loading";
 import MapHeader from "./components/MapHeader/MapHeader";
+import Contact from "./components/Contact/Contact";
+import TerminalTable from "./components/TerminalTable/TerminalTable";
+import Weather from "./components/CityWeather/Weather";
+import FerryTable from "./components/FerryTable/FerryTable";
+
 import PropTypes from "prop-types";
 import "./App.css";
 // import TerminalTable from "./components/TerminalTable/TerminalTable";
@@ -35,28 +40,52 @@ import {
   Typography,
   ThemeProvider,
   Hidden,
+  Button,
   BottomNavigation,
   BottomNavigationAction,
+  Icon,
+  IconButton,
+  ClickAwayListener,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core";
+import CancelPresentationIcon from "@material-ui/icons/CancelPresentation";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Timeline } from "react-twitter-widgets";
-import React, { useState, Suspense } from "react";
-
+import React, { useState } from "react";
+import styled from "styled-components";
 import Map from "./components/Map/Map";
-import TransportNewLight from "./fonts/TransportNewLight_gdi.ttf";
-import TransportNewMedium from "./fonts/TransportNewMedium_gdi.ttf";
+import TransportNewLight_gdi from "./fonts/TransportNewLight_gdi.ttf";
+//import TransportNewMedium from "./fonts/TransportNewMedium_gdi.ttf";
 require("leaflet-plugins/layer/tile/Bing.js");
 
-const Contact = React.lazy(() => import("./components/Contact/Contact"));
+// const Contact = React.lazy(() => import("./components/Contact/Contact"));
 
-const Weather = React.lazy(() => import("./components/CityWeather/Weather"));
-const TerminalTable = React.lazy(() =>
-  import("./components/TerminalTable/TerminalTable")
-);
-const FerryTable = React.lazy(() =>
-  import("./components/FerryTable/FerryTable")
-);
+// const Weather = React.lazy(() => import("./components/CityWeather/Weather"));
+// const TerminalTable = React.lazy(() =>
+//   import("./components/TerminalTable/TerminalTable")
+// );
+// const FerryTable = React.lazy(() =>
+//   import("./components/FerryTable/FerryTable")
+// );
+const ContentWrapper = styled.div.attrs({
+  className: "app-wrapper",
+})`
+  &.wrapper {
+    height: 900px;
+    position: "relative";
+  }
+`;
+const StyledDrawer = styled(Drawer)`
+  & > div {
+    height: 100vh;
+    /* margin-top: 40px; */
+    @media screen and (max-width: 768px) {
+      height: ${() => `calc(100vh - 60px)`};
+      /* height: 100vh; */
+      top: 60px;
+    }
+  }
+`;
 const drawerWidth = "auto";
 const tabsHeight = "50px";
 
@@ -78,7 +107,7 @@ const theme = createMuiTheme({
   overrides: {
     MuiCssBaseline: {
       "@global": {
-        "@font-face": [TransportNewLight],
+        "@font-face": [TransportNewLight_gdi],
       },
     },
   },
@@ -94,11 +123,14 @@ const theme = createMuiTheme({
       main: "#c75a17",
       dark: "#b44c0b",
     },
+    white: "#FDFDFD",
+    black: "#0B0B0B",
   },
 });
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    heigh: window.innerHeight,
   },
   tabs: {
     flexGrow: 1,
@@ -123,18 +155,43 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 12,
     marginRight: 20,
   },
+  closeBtn: {
+    maxWidth: 200,
+    alignSelf: "flex-end",
+    margin: 5,
+    minHeight: 44,
+  },
   hide: {
     display: "none",
   },
-  drawer: {
+  customDrawer: {
     width: drawerWidth,
     flexShrink: 0,
+    height: window.innerHeight,
+    // [theme.breakpoints.down("sm")]: {
+    //   height: 700,
+    // },
   },
   drawerDiv: {
     padding: 10,
   },
+  drawerControl: {
+    height: 900,
+  },
   drawerPaper: {
     width: drawerWidth,
+    height: "100%",
+    overflow: "auto",
+    // maxHeight: 900,
+    // minHeight: 300,
+    [theme.breakpoints.up("md")]: {
+      overflow: "auto",
+      height: "100%",
+      position: "relative",
+    },
+  },
+  customDrawerPaper: {
+    height: window.innerHeight,
   },
   drawerType: {
     fontSize: theme.typography.pxToRem(24),
@@ -187,7 +244,10 @@ const useStyles = makeStyles((theme) => ({
     width: 24,
   },
   mapHeight: {
-    height: "calc(100vh - 100px)",
+    height: "calc(100vh - 220px)",
+    // height: "100%",
+    maxHeight: 500,
+    minHeight: 200,
   },
   accordionHeading: {
     fontSize: theme.typography.pxToRem(15),
@@ -222,6 +282,11 @@ const App = () => {
   const [tabValue, setTabValue] = useState(0);
 
   const toggleDrawer = (side, open) => (event) => {
+    let windowOffest = window.scrollY;
+    document.body.setAttribute(
+      "style",
+      `position:fixed; top: -${windowOffest}px; left: 0;`
+    );
     if (
       event.type === "keydown" &&
       (event.key === "Tab" || event.key === "Shift")
@@ -254,295 +319,344 @@ const App = () => {
             <MapHeader />
             <Map className={classes.mapHeight}></Map>
           </div>
-          <div
-            id="drawers"
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-          >
-            <Drawer
+          <div id="drawers" className={classes.drawerPaper}>
+            <StyledDrawer
               open={drawers.terminalDrawer}
               //variant="persistent"
               onClose={toggleDrawer("terminalDrawer", false)}
               onClick={toggleDrawer("terminalDrawer", false)}
-              className={classes.drawer}
+              className={classes.customDrawer}
             >
-              <div
-                tabIndex={0}
-                role="button"
+              <Button
+                variant="contained"
+                color="primary"
+                className={(classes.button, classes.closeBtn)}
+                endIcon={<CancelPresentationIcon />}
+                onClose={toggleDrawer("terminalDrawer", false)}
                 onClick={toggleDrawer("terminalDrawer", false)}
-                onKeyDown={toggleDrawer("terminalDrawer", false)}
-              />
-              <div className="viewDrawer">
-                <Suspense fallback={<div>Loading Terminal Table...</div>}>
+              >
+                Close
+              </Button>
+              <Paper className={classes.customDrawerPaper}>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  onClick={toggleDrawer("terminalDrawer", false)}
+                  onKeyDown={toggleDrawer("terminalDrawer", false)}
+                />
+                <div className="viewDrawer">
                   <TerminalTable />
-                </Suspense>
-              </div>
-            </Drawer>
-            <Drawer
+                </div>
+              </Paper>
+            </StyledDrawer>
+            <StyledDrawer
               anchor="left"
               open={drawers.ferryDrawer}
               //variant="persistent"
               onClose={toggleDrawer("ferryDrawer", false)}
               onClick={toggleDrawer("ferryDrawer", false)}
-              className={classes.drawer}
+              className={classes.customDrawer}
             >
-              <div
-                tabIndex={0}
-                role="button"
+              <Button
+                variant="contained"
+                color="primary"
+                className={(classes.button, classes.closeBtn)}
+                endIcon={<CancelPresentationIcon />}
+                onClose={toggleDrawer("ferryDrawer", false)}
                 onClick={toggleDrawer("ferryDrawer", false)}
-                onKeyDown={toggleDrawer("ferryDrawer", false)}
-              />
-              <div className="FerryTable">
-                <Suspense fallback={<div>Loading Ferry Table...</div>}>
+              >
+                Close
+              </Button>
+              <Paper className={classes.customDrawerPaper}>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  onClick={toggleDrawer("ferryDrawer", false)}
+                  onKeyDown={toggleDrawer("ferryDrawer", false)}
+                />
+                <div className="FerryTable">
                   <FerryTable />
-                </Suspense>
-              </div>
-            </Drawer>
+                </div>
+              </Paper>
+            </StyledDrawer>
 
-            <Drawer
+            <StyledDrawer
               anchor="left"
               open={drawers.twitterDrawer}
               //variant="persistent"
-              onClose={toggleDrawer("twitterDrawer", false)}
-              onClick={toggleDrawer("twitterDrawerr", false)}
-              className={classes.drawer}
+              variant="temporary"
+              onBackdropClick={toggleDrawer("twitterDrawer", false)}
+              className={classes.customDrawer}
             >
-              <div
-                tabIndex={0}
-                role="button"
+              <Button
+                variant="contained"
+                color="primary"
+                className={(classes.button, classes.closeBtn)}
+                endIcon={<CancelPresentationIcon />}
+                onClose={toggleDrawer("twitterDrawer", false)}
                 onClick={toggleDrawer("twitterDrawer", false)}
-                onKeyDown={toggleDrawer("twitterDrawer", false)}
-              />
-              <div id="twitter">
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="ferry-content"
-                    id="ferry-header"
-                  >
-                    <Typography className={classes.accordionHeading}>
-                      Ferry Division
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Timeline
-                      dataSource={{
-                        sourceType: "profile",
-                        screenName: "NCDOT_Ferry",
-                      }}
-                      options={{
-                        height: "400",
-                      }}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="NCFerryCTuck-content"
-                    id="NCFerryCTuck-header"
-                  >
-                    <Typography className={classes.accordionHeading}>
-                      NCFerryCurrituck
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Timeline
-                      dataSource={{
-                        sourceType: "profile",
-                        screenName: "NCFerryCTuck",
-                      }}
-                      options={{
-                        height: "400",
-                      }}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="NCFerryPamRiver-content"
-                    id="NCFerryPamRiver-header"
-                  >
-                    <Typography className={classes.accordionHeading}>
-                      NCFerryPamRiver
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Timeline
-                      dataSource={{
-                        sourceType: "profile",
-                        screenName: "NCFerryPamRiver",
-                      }}
-                      options={{
-                        height: "400",
-                      }}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="NCFerryCherryBranch-content"
-                    id="NCFerryCherryBranch-header"
-                  >
-                    <Typography className={classes.accordionHeading}>
-                      NCFerryCherryBranch
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Timeline
-                      dataSource={{
-                        sourceType: "profile",
-                        screenName: "NCFerryCHBranch",
-                      }}
-                      options={{
-                        height: "400",
-                      }}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="NCFerrySouthport-content"
-                    id="NCFerrySouthport-header"
-                  >
-                    <Typography className={classes.accordionHeading}>
-                      NCFerrySouthport
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Timeline
-                      dataSource={{
-                        sourceType: "profile",
-                        screenName: "NCFerrySPort",
-                      }}
-                      options={{
-                        height: "400",
-                      }}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="NCFerryHatteras-content"
-                    id="NCFerryHatteras-header"
-                  >
-                    <Typography className={classes.accordionHeading}>
-                      NCFerryHatteras
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Timeline
-                      dataSource={{
-                        sourceType: "profile",
-                        screenName: "NCFerryHatteras",
-                      }}
-                      options={{
-                        height: "400",
-                      }}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="NCFerryPamSound-content"
-                    id="NCFerryPamSound-header"
-                  >
-                    <Typography className={classes.accordionHeading}>
-                      NCFerryPamSound
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Timeline
-                      dataSource={{
-                        sourceType: "profile",
-                        screenName: "NCFerryPamSound",
-                      }}
-                      options={{
-                        height: "400",
-                      }}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-              </div>
-            </Drawer>
-            <Drawer
+              >
+                Close
+              </Button>
+
+              <Paper className={classes.customDrawerPaper}>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  onClick={toggleDrawer("twitterDrawer", false)}
+                  onKeyDown={toggleDrawer("twitterDrawer", false)}
+                />
+                <div id="twitter">
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="ferry-content"
+                      id="ferry-header"
+                    >
+                      <Typography className={classes.accordionHeading}>
+                        Ferry Division
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Timeline
+                        dataSource={{
+                          sourceType: "profile",
+                          screenName: "NCDOT_Ferry",
+                        }}
+                        options={{
+                          height: "300",
+                        }}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="NCFerryCTuck-content"
+                      id="NCFerryCTuck-header"
+                    >
+                      <Typography className={classes.accordionHeading}>
+                        NCFerryCurrituck
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Timeline
+                        dataSource={{
+                          sourceType: "profile",
+                          screenName: "NCFerryCTuck",
+                        }}
+                        options={{
+                          height: "300",
+                        }}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="NCFerryPamRiver-content"
+                      id="NCFerryPamRiver-header"
+                    >
+                      <Typography className={classes.accordionHeading}>
+                        NCFerryPamRiver
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Timeline
+                        dataSource={{
+                          sourceType: "profile",
+                          screenName: "NCFerryPamRiver",
+                        }}
+                        options={{
+                          height: "300",
+                        }}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="NCFerryCherryBranch-content"
+                      id="NCFerryCherryBranch-header"
+                    >
+                      <Typography className={classes.accordionHeading}>
+                        NCFerryCherryBranch
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Timeline
+                        dataSource={{
+                          sourceType: "profile",
+                          screenName: "NCFerryCHBranch",
+                        }}
+                        options={{
+                          height: "300",
+                        }}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="NCFerrySouthport-content"
+                      id="NCFerrySouthport-header"
+                    >
+                      <Typography className={classes.accordionHeading}>
+                        NCFerrySouthport
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Timeline
+                        dataSource={{
+                          sourceType: "profile",
+                          screenName: "NCFerrySPort",
+                        }}
+                        options={{
+                          height: "300",
+                        }}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="NCFerryHatteras-content"
+                      id="NCFerryHatteras-header"
+                    >
+                      <Typography className={classes.accordionHeading}>
+                        NCFerryHatteras
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Timeline
+                        dataSource={{
+                          sourceType: "profile",
+                          screenName: "NCFerryHatteras",
+                        }}
+                        options={{
+                          height: "300",
+                        }}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="NCFerryPamSound-content"
+                      id="NCFerryPamSound-header"
+                    >
+                      <Typography className={classes.accordionHeading}>
+                        NCFerryPamSound
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Timeline
+                        dataSource={{
+                          sourceType: "profile",
+                          screenName: "NCFerryPamSound",
+                        }}
+                        options={{
+                          height: "300",
+                        }}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                </div>
+              </Paper>
+            </StyledDrawer>
+
+            <StyledDrawer
               anchor="left"
               open={drawers.weatherDrawer}
               //variant="persistent"
               onClose={toggleDrawer("weatherDrawer", false)}
               onClick={toggleDrawer("weatherDrawer", false)}
-              className={classes.drawer}
+              className={classes.customDrawer}
             >
-              <div
-                tabIndex={0}
-                role="button"
+              <Button
+                variant="contained"
+                color="primary"
+                className={(classes.button, classes.closeBtn)}
+                endIcon={<CancelPresentationIcon />}
+                onClose={toggleDrawer("weatherDrawer", false)}
                 onClick={toggleDrawer("weatherDrawer", false)}
-                onKeyDown={toggleDrawer("weatherDrawer", false)}
-              />
-              <div id="weather" className={classes.drawerDiv}>
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <Typography
-                      gutterBottom
-                      variant="h4"
-                      className={classes.drawerType}
-                    >
-                      Weather
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary">
-                      provided by{" "}
-                      <a href="https://www.weather.gov/" target="_blank">
-                        National Weather Service
-                      </a>
-                    </Typography>
+              >
+                Close
+              </Button>
+              <Paper className={classes.customDrawerPaper}>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  onClick={toggleDrawer("weatherDrawer", false)}
+                  onKeyDown={toggleDrawer("weatherDrawer", false)}
+                />
+                <div id="weather" className={classes.drawerDiv}>
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <Typography
+                        gutterBottom
+                        variant="h4"
+                        className={classes.drawerType}
+                      >
+                        Weather
+                      </Typography>
+                      <Typography variant="body1" color="textSecondary">
+                        provided by{" "}
+                        <a href="https://www.weather.gov/" target="_blank">
+                          National Weather Service
+                        </a>
+                      </Typography>
+                    </Grid>
                   </Grid>
-                </Grid>
-                <>
-                  <Suspense fallback={<div>Loading Weather...</div>}>
+                  <>
                     <Weather />
-                  </Suspense>
-                </>
-              </div>
-            </Drawer>
-            <Drawer
+                  </>
+                </div>
+              </Paper>
+            </StyledDrawer>
+            <StyledDrawer
               anchor="left"
               open={drawers.contactDrawer}
               //variant="persistent"
               onClose={toggleDrawer("contactDrawer", false)}
               onClick={toggleDrawer("contactDrawer", false)}
-              className={classes.drawer}
+              className={classes.customDrawer}
             >
-              <div
-                tabIndex={0}
-                role="button"
+              <Button
+                variant="contained"
+                color="primary"
+                className={(classes.button, classes.closeBtn)}
+                endIcon={<CancelPresentationIcon />}
+                onClose={toggleDrawer("contactDrawer", false)}
                 onClick={toggleDrawer("contactDrawer", false)}
-                onKeyDown={toggleDrawer("contactDrawer", false)}
-              />
-              <div id="contact" className={classes.drawerDiv}>
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <Typography
-                      gutterBottom
-                      variant="h4"
-                      className={classes.drawerType}
-                    >
-                      Links
-                    </Typography>
+              >
+                Close
+              </Button>
+              <Paper className={classes.customDrawerPaper}>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  onClick={toggleDrawer("contactDrawer", false)}
+                  onKeyDown={toggleDrawer("contactDrawer", false)}
+                />
+                <div id="contact" className={classes.drawerDiv}>
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <Typography
+                        gutterBottom
+                        variant="h4"
+                        className={classes.drawerType}
+                      >
+                        Links
+                      </Typography>
+                    </Grid>
                   </Grid>
-                </Grid>
-                <>
-                  <Suspense fallback={<div>Loading Links...</div>}>
+                  <>
                     <Contact />
-                  </Suspense>
-                </>
-              </div>
-            </Drawer>
+                  </>
+                </div>
+              </Paper>
+            </StyledDrawer>
           </div>
 
           <div id="tabHolder" className={(classes.root, classes.tabContainer)}>

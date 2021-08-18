@@ -3,7 +3,7 @@ const ports = [
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-76.014193, 36.449249],
+      coordinates: [-76.014, 36.449471],
     },
     properties: {
       title: "Currituck Ferry Terminal",
@@ -11,13 +11,16 @@ const ports = [
       address: "175 Courthouse Rd. Currituck, NC 27929",
       Site: "http://www.visitcurrituck.com/",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-75.92673227, 36.4837451],
+      coordinates: [-75.927643, 36.484753],
     },
     properties: {
       title: "Knotts Island Ferry Terminal",
@@ -25,6 +28,9 @@ const ports = [
       address: "Ferry Dock Road Knotts Island, NC",
       Site: "http://www.visitcurrituck.com/",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
@@ -34,32 +40,38 @@ const ports = [
       coordinates: [-75.77851608, 35.1910618],
     },
     properties: {
-      title: "Ocracoke Terminal - South Dock",
+      title: "Ocracoke Terminal - Hatteras Inlet South Dock",
       phone: "2529966000",
       address: "N.C. Highway 12, Ocracoke, NC 27960",
       Site: "https://www.visitocracokenc.com/",
       Reservations: "https://ferry.ncdot.gov/#/",
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-75.70271552, 35.20804996],
+      coordinates: [-75.702545, 35.207542],
     },
     properties: {
-      title: "Hatteras Ferry Terminal",
+      title: "Hatteras Inlet North Dock Terminal",
       phone: "2529966000",
       address: "59063 NC Hwy 12 South Hatteras, NC 27943",
       Site: "https://www.outerbanks.org/",
       Reservations: "https://ferry.ncdot.gov/#/",
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-75.98709941, 35.11508709],
+      coordinates: [-75.986732, 35.115784],
     },
     properties: {
       title: "Ocracoke Terminal - Silver Lake",
@@ -67,13 +79,16 @@ const ports = [
       address: "130 Pilot Town Circle Ocracoke, NC 27960",
       Site: "https://www.visitocracokenc.com/",
       Reservations: "https://ferry.ncdot.gov/#/",
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-76.33324921, 35.39494756],
+      coordinates: [-76.325867, 35.394806],
     },
     properties: {
       title: "Swan Quarter Ferry Terminal",
@@ -81,13 +96,16 @@ const ports = [
       address: "748 Oyster Creek Rd. Swan Quarter, NC 27885",
       Site: "http://www.hydecountync.gov/",
       Reservations: "https://ferry.ncdot.gov/#/",
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-76.31425, 35.018565],
+      coordinates: [-76.314758, 35.018227],
     },
     properties: {
       title: "Cedar Island Ferry Terminal",
@@ -95,20 +113,26 @@ const ports = [
       address: "3619 Cedar Island Rd. Cedar Island, NC 28520",
       Site: "http://www.crystalcoastnc.org/",
       Reservations: "https://ferry.ncdot.gov/#/",
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-76.74074918, 35.42791599],
+      coordinates: [-76.740225, 35.428427],
     },
     properties: {
       title: "Bayview Ferry Terminal",
       phone: "2529644521",
       address: "229 NC Hwy. 306 North Bath, NC 27808",
-      Site: "http://www.nchistoricsites.org/bath/bath.htm",
+      Site: "https://historicsites.nc.gov/historic-bath",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
@@ -123,6 +147,9 @@ const ports = [
       address: "NC Hwy. 306 South Aurora, NC 27806",
       Site: "http://aurorafossilmuseum.org/",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
@@ -137,6 +164,9 @@ const ports = [
       address: "N.C. Highway 306 Minnesott Beach, NC 28510",
       Site: "http://www.townoforiental.com/",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
@@ -151,6 +181,9 @@ const ports = [
       address: "2300 Ferry Road Havelock, NC 28532",
       Site: "http://www.visitnewbern.com/",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
@@ -165,6 +198,9 @@ const ports = [
       address: "2422 S. Fort Fisher Blvd. Kure Beach, NC 28449",
       Site: "http://www.wilmingtonandbeaches.com/",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
@@ -179,6 +215,9 @@ const ports = [
       address: "1650 Ferry Rd. Southport, NC 28461",
       Site: "http://www.southport-oakisland.com/",
       Reservations: null,
+      type: "daily",
+      schedule:
+        "https://www.ncdot.gov/travel-maps/ferry-tickets-services/routes/Pages/default.aspx",
     },
   },
   {
@@ -193,13 +232,15 @@ const ports = [
       address: "8550 Shipyard Road Manns Harbor, NC 27953",
       Site: null,
       Reservations: null,
+      type: "maintenance",
+      schedule: null,
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-75.77049, 35.698587],
+      coordinates: [-75.771809, 35.698763],
     },
     properties: {
       title: "Stumpy Point Ferry Terminal",
@@ -207,20 +248,24 @@ const ports = [
       address: "100 Log Storage Rd, Stumpy Point, NC 27978",
       Site: null,
       Reservations: null,
+      type: "emergency",
+      schedule: null,
     },
   },
   {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [-75.471143, 35.595447],
+      coordinates: [-75.469738, 35.595817],
     },
     properties: {
       title: "Rodanthe Ferry Terminal",
       phone: null,
-      address: "100 Log Storage Rd, Stumpy Point, NC 27978",
+      address: "23176 Myrna Peters Rd, Rodanthe, NC 27968",
       Site: null,
       Reservations: null,
+      type: "emergency",
+      schedule: null,
     },
   },
 ];

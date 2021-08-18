@@ -62,13 +62,13 @@ const views = [
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [35.195676, -75.764501],
+      coordinates: [35.193526, -75.839136],
     },
     properties: {
       id: 6,
-      title: "Passenger",
+      title: "Passenger (Seasonal)",
       // title: "Ocracoke to Hatteras",
-      zoom: 13,
+      zoom: 12,
       routeType: "Reservation Walk-Up",
       ferryType: "Passenger",
     },
@@ -153,7 +153,7 @@ const views = [
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: [35.401973, -75.594215],
+      coordinates: [35.469134, -75.714166],
     },
     properties: {
       id: 8,

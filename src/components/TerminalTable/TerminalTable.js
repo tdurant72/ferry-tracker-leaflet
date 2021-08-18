@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import {
   Paper,
@@ -29,6 +29,17 @@ const useStyles = makeStyles((theme) => ({
   tableHeader: {
     backgroundColor: theme.palette.primary.dark,
   },
+  tableItem: {
+    background: theme.palette.white,
+  },
+  customTableRow: {
+    "&:nth-of-type(even)": {
+      backgroundColor: "#dedede",
+    },
+    "&:nth-of-type(odd)": {
+      backgroundColor: theme.palette.white,
+    },
+  },
   tableHeaderFont: {
     fontSize: "16px",
     color: theme.palette.primary.contrastText,
@@ -47,6 +58,35 @@ const TerminalTable = () => {
   // const [state, setState, currentView, setCurrentView] = useContext(FerryAppContext);
 
   const classes = useStyles();
+  // const scrollPage = () => {
+  //   window.scrollTo({
+  //     top: 0,
+  //     behavior: "smooth",
+  //   });
+  //   console.log("window scroll called", window.screenTop);
+  // };
+  // useEffect(() => {
+  //   window.addEventListener("scroll", scrollPage);
+  //   scrollPage();
+
+  //   return () => {
+  //     window.removeEventListener("scroll", scrollPage);
+  //   };
+  // }, [setCurrentView]);
+  useEffect(
+    () => () => {
+      try {
+        window.scroll({
+          top: 60,
+          left: 0,
+          behavior: "smooth",
+        });
+      } catch (error) {
+        window.scrollTo(60, 0);
+      }
+    },
+    [currentView]
+  );
   return (
     <TableContainer component={Paper} className={classes.root}>
       <Table className={classes.table}>
@@ -63,8 +103,11 @@ const TerminalTable = () => {
         </TableHead>
         <TableBody>
           {state.views.map((view) => (
-            <TableRow key={view.properties.id}>
-              <TableCell component="th" scope="row">
+            <TableRow
+              key={view.properties.id}
+              className={classes.customTableRow}
+            >
+              <TableCell>
                 <span
                   className={classes.links}
                   latitude={view.geometry.coordinates[1]}
